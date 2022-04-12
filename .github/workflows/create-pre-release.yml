@@ -5,7 +5,7 @@ on:
       - main
 
 jobs:
-  create-release:
+  create-pre-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,8 +19,6 @@ jobs:
         uses: TriPSs/conventional-changelog-action@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          git-message: "docs(all): update changelog"
-          git-user-name: "test"
           skip-version-file: "true"
           git-push: "false"
 
