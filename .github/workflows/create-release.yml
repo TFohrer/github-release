@@ -1,0 +1,35 @@
+name: Deploy Release
+on:
+  workflow_dispatch:
+    branches:
+      - main
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create changelog
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          git-message: "docs(all): update changelog"
+          git-user-name: "test"
+          skip-version-file: "true"
+          git-push: "false"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.changelog.outputs.tag }}
+          name: ${{ steps.changelog.outputs.tag }}
+          body: ${{ steps.changelog.outputs.clean_changelog }}
+          prerelease: false
