@@ -19,6 +19,24 @@ jobs:
         id: previoustag
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
 
+      - name: Set Workflow variables
+        id: set-workflow-vars
+        run: |
+          echo ::set-output name=version::$(echo $GITHUB_REF | cut -d / -f 3)
+
+      - name: Send Release message to slack
+        uses: slackapi/slack-github-action@v1.18.0
+        with:
+          payload: |
+            {
+              "release_version": "${{ steps.set-workflow-vars.outputs.version }}",
+              "test": ${{ steps.set-workflow-vars.outputs.version }},
+              "previoustag": "${{ steps.previoustag.outputs.tag }}",
+              "test": ${{ steps.previoustag.outputs.tag }}
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_RELEASE_WEBHOOK_URL }}
+
       - name: Create changelog
         id: changelog
         uses: TriPSs/conventional-changelog-action@v3
